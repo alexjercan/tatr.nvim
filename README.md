@@ -1,6 +1,6 @@
 # tatr.nvim
 
-Neovim plugin for [tatr](https://github.com/yourusername/tatr) - a simple task tracker.
+Neovim plugin for [tatr](https://github.com/alexjercan/tatr) - a simple task tracker.
 
 ## Features
 
@@ -12,7 +12,7 @@ Neovim plugin for [tatr](https://github.com/yourusername/tatr) - a simple task t
 ## Requirements
 
 - Neovim >= 0.9
-- [tatr](https://github.com/yourusername/tatr) CLI tool installed and available in PATH
+- [tatr](https://github.com/alexjercan/tatr) CLI tool installed and available in PATH
 - [telescope.nvim](https://github.com/nvim-telescope/telescope.nvim) (optional, for better task browsing)
 
 ## Installation
@@ -21,15 +21,15 @@ Using [lazy.nvim](https://github.com/folke/lazy.nvim):
 
 ```lua
 {
-    "yourusername/tatr.nvim",
+    "alexjercan/tatr.nvim",
     config = function()
         require("tatr").setup({
             -- Optional: customize tatr command path
             -- tatr_cmd = "tatr",
-            
+
             -- Optional: default priority for new tasks
             -- default_priority = 0,
-            
+
             -- Optional: default status for new tasks
             -- default_status = "OPEN",
         })
@@ -44,7 +44,7 @@ Using [packer.nvim](https://github.com/wbthomason/packer.nvim):
 
 ```lua
 use {
-    "yourusername/tatr.nvim",
+    "alexjercan/tatr.nvim",
     config = function()
         require("tatr").setup()
     end,
@@ -135,10 +135,10 @@ require("tatr").insert({
 require("tatr").setup({
     -- Path to tatr command (default: "tatr")
     tatr_cmd = "tatr",
-    
+
     -- Default priority for new tasks (default: 0)
     default_priority = 0,
-    
+
     -- Default status for new tasks (default: "OPEN")
     -- Valid values: "OPEN", "IN_PROGRESS", "CLOSED"
     default_status = "OPEN",
