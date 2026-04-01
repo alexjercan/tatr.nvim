@@ -1,6 +1,6 @@
 # Implement a nvim command that will insert a task as a TODO comment
 
-- STATUS: OPEN
+- STATUS: CLOSED
 - PRIORITY: 70
 - TAGS: feature
 
