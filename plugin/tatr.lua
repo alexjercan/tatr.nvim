@@ -1,0 +1,2 @@
+-- vim.api.nvim_create_user_command("TatrNew", require("tatr").new, {})
+-- vim.api.nvim_create_user_command("TatrList", require("tatr").list, {})
