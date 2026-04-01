@@ -81,6 +81,26 @@ Examples:
 :TatrList title
 ```
 
+#### `:TatrInsert [sort]`
+
+Insert a task as a TODO comment at the current line. Opens a Telescope picker to select a task, then inserts a comment in the format:
+
+```
+// TODO(HUID): Task title
+```
+
+The comment string is automatically detected based on the current file's `commentstring` setting (e.g., `//` for JavaScript, `#` for Python, `--` for Lua).
+
+Optional sort parameter: `created`, `priority`, or `title` (default: `created`)
+
+Examples:
+```vim
+:TatrInsert
+:TatrInsert priority
+```
+
+**Note:** This command requires [telescope.nvim](https://github.com/nvim-telescope/telescope.nvim) to be installed.
+
 #### `:TatrSetup`
 
 Reload the plugin configuration.
@@ -100,6 +120,11 @@ require("tatr").new({
 
 -- List tasks
 require("tatr").list({
+    sort = "priority",  -- or "created", "title"
+})
+
+-- Insert task as TODO comment
+require("tatr").insert({
     sort = "priority",  -- or "created", "title"
 })
 ```
@@ -138,6 +163,11 @@ vim.keymap.set("n", "<leader>tl", "<cmd>TatrList<cr>", {
 -- List tasks sorted by priority
 vim.keymap.set("n", "<leader>tp", "<cmd>TatrList priority<cr>", {
     desc = "List tasks by priority",
+})
+
+-- Insert task as TODO comment
+vim.keymap.set("n", "<leader>ti", "<cmd>TatrInsert<cr>", {
+    desc = "Insert task as TODO comment",
 })
 ```
 

@@ -248,6 +248,187 @@ M.list = function(opts)
     end
 end
 
+---Parse task line to extract HUID and title
+---@param line string Task line from tatr ls output
+---@return string? huid Task HUID (timestamp)
+---@return string? title Task title
+local function parse_task_line(line)
+    -- Format: /path/to/tasks/HUID/TASK.md: [PRIORITY: X, TAGS: y] Title
+    -- Extract HUID from path
+    local huid = line:match("/(%d+%-%d+)/TASK%.md:")
+    if not huid then
+        return nil, nil
+    end
+
+    -- Extract title (everything after the closing bracket and space)
+    local title = line:match("%]%s+(.+)$")
+    if not title then
+        return nil, nil
+    end
+
+    return huid, title
+end
+
+---Get comment string for current buffer filetype
+---@return string comment_string Comment string for the filetype
+local function get_comment_string()
+    -- Get commentstring option (e.g., "// %s" or "# %s")
+    local commentstring = vim.bo.commentstring
+
+    -- Extract the comment prefix (before %s)
+    local comment_prefix = commentstring:match("^(.-)%%s")
+    if comment_prefix then
+        -- Remove trailing space if present
+        comment_prefix = vim.trim(comment_prefix)
+        return comment_prefix
+    end
+
+    -- Default to // if commentstring is not set
+    return "//"
+end
+
+---Insert task as TODO comment at current line
+---@param opts table? Options for inserting task
+M.insert = function(opts)
+    opts = opts or {}
+
+    -- Build tatr ls command
+    local args = { "ls" }
+
+    -- Add sort option
+    if opts.sort then
+        table.insert(args, "-s")
+        table.insert(args, opts.sort)
+    end
+
+    -- Execute command
+    local output, error_msg = execute_tatr(args)
+    if error_msg then
+        vim.notify(error_msg, vim.log.levels.ERROR)
+        return
+    end
+
+    -- Try to use telescope if available
+    local ok_telescope, telescope_ok = pcall(function()
+        local ok, pickers = pcall(require, "telescope.pickers")
+        if not ok then
+            return false
+        end
+        local ok2, finders = pcall(require, "telescope.finders")
+        if not ok2 then
+            return false
+        end
+        local ok3, conf = pcall(require, "telescope.config")
+        if not ok3 then
+            return false
+        end
+        local ok4, actions = pcall(require, "telescope.actions")
+        if not ok4 then
+            return false
+        end
+        local ok5, action_state = pcall(require, "telescope.actions.state")
+        if not ok5 then
+            return false
+        end
+
+        -- Parse output into lines
+        local lines = vim.split(output or "", "\n")
+        local entries = {}
+        for _, line in ipairs(lines) do
+            if line ~= "" then
+                table.insert(entries, line)
+            end
+        end
+
+        if #entries == 0 then
+            vim.notify("No tasks found", vim.log.levels.INFO)
+            return true
+        end
+
+        -- Create telescope picker
+        pickers
+            .new({}, {
+                prompt_title = "Insert Task as TODO Comment",
+                finder = finders.new_table({
+                    results = entries,
+                }),
+                sorter = conf.values.generic_sorter({}),
+                attach_mappings = function(prompt_bufnr, _)
+                    actions.select_default:replace(function()
+                        actions.close(prompt_bufnr)
+                        local selection = action_state.get_selected_entry()
+                        if selection then
+                            local line = selection[1]
+                            local huid, title = parse_task_line(line)
+
+                            if not huid or not title then
+                                vim.notify(
+                                    "Failed to parse task line",
+                                    vim.log.levels.ERROR
+                                )
+                                return
+                            end
+
+                            -- Get current buffer and cursor position
+                            local buffer = vim.api.nvim_get_current_buf()
+                            local cursor_line =
+                                vim.api.nvim_win_get_cursor(0)[1]
+
+                            -- Get comment string for current filetype
+                            local comment_str = get_comment_string()
+
+                            -- Build TODO comment
+                            local todo_comment = string.format(
+                                "%s TODO(%s): %s",
+                                comment_str,
+                                huid,
+                                title
+                            )
+
+                            -- Get current line content and indentation
+                            local current_line_content =
+                                vim.api.nvim_buf_get_lines(
+                                    buffer,
+                                    cursor_line - 1,
+                                    cursor_line,
+                                    false
+                                )[1]
+                            local indent = current_line_content:match("^%s*")
+                                or ""
+
+                            -- Insert the TODO comment with proper indentation
+                            vim.api.nvim_buf_set_lines(
+                                buffer,
+                                cursor_line - 1,
+                                cursor_line - 1,
+                                false,
+                                { indent .. todo_comment }
+                            )
+
+                            vim.notify(
+                                "Inserted TODO comment",
+                                vim.log.levels.INFO
+                            )
+                        end
+                    end)
+                    return true
+                end,
+            })
+            :find()
+
+        return true
+    end)
+
+    -- If telescope is not available, show error
+    if not ok_telescope or not telescope_ok then
+        vim.notify(
+            "TatrInsert requires telescope.nvim to be installed",
+            vim.log.levels.ERROR
+        )
+        return
+    end
+end
+
 ---Health check
 M.health = function()
     return require("tatr.health").check()
