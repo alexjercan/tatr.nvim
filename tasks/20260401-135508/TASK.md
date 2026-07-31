@@ -3,6 +3,9 @@
 - STATUS: CLOSED
 - PRIORITY: 70
 - TAGS: feature
+- KIND: TASK
+- FLOW STEP: DONE
+- PLAN STATUS: NOT_REQUIRED
 
 We want to be able to hit a keybinding and have a TODO comment inserted at the
 current line. That TODO comment should be in the format of:

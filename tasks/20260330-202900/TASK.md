@@ -3,6 +3,9 @@
 - STATUS: CLOSED
 - PRIORITY: 90
 - TAGS: feature
+- KIND: TASK
+- FLOW STEP: DONE
+- PLAN STATUS: NOT_REQUIRED
 
 This is a follow up to the Task Tracker project. We want to be able to create
 tasks from the editor and link them to the file and line number where they were

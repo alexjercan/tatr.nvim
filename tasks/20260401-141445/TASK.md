@@ -3,6 +3,9 @@
 - STATUS: OPEN
 - PRIORITY: 50
 - TAGS: feature
+- KIND: TASK
+- FLOW STEP: BACKLOG
+- PLAN STATUS: DRAFT
 
 When we have a comment we can press a keybind and we convert the comment under
 the cursor into a task and then update that comment into a todo.
