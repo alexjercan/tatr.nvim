@@ -1,4 +1,5 @@
-*tatr.txt*            For Neovim >= 0.8.0           Last change: 2026 April 01
+*tatr.txt*
+                              For Neovim >= 0.8.0    Last change: 2026 July 31
 
 ==============================================================================
 Table of Contents                                     *tatr-table-of-contents*
